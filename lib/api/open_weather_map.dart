@@ -6,16 +6,22 @@ class OpenWeatherMapAPI {
   static const String _path = "/data/2.5/";
   static const String apiKey = APIConstant.apiKey;
 
+  // fetch current weather using geolocation
+  Uri geocodingWeather(var lat, var long) => _buildURI(
+      endpoint: 'weather',
+      parameterBuilder: () => _geoQueryParameter(lat, long),
+  );
+
   // weather uri builder
   Uri weather(String city) => _buildURI(
     endpoint: 'weather',
-    parameterBuilder: () =>  defaultQueryParameters(city),
+    parameterBuilder: () =>  _defaultQueryParameters(city),
   );
 
   // forecast uri builder
   Uri forecast(String city) => _buildURI(
     endpoint: 'forecast',
-    parameterBuilder: () => defaultQueryParameters(city),
+    parameterBuilder: () => _defaultQueryParameters(city),
   );
 
   // uri builder
@@ -28,18 +34,18 @@ class OpenWeatherMapAPI {
     );
   }
 
-  // default query parameter
-  Map<String, dynamic> defaultQueryParameters(String city) => {
+  // city query parameter
+  Map<String, dynamic> _defaultQueryParameters(String city) => {
     'appid': apiKey,
     'units': 'metric',
     'q': city,
   };
 
-  // city name query parameter
-  Map<String, dynamic> latLonQueryParameter(double lat, double lon) => {
+  // geolocation query parameter
+  Map<String, dynamic> _geoQueryParameter(var lat, var lon) => {
     'appid': apiKey,
     'units': 'metric',
-    'lat': lat,
-    'long': lon
+    'lat': lat.toString(),
+    'lon': lon.toString()
   };
 }
