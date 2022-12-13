@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Open WeatherMap',
+      title: 'Open Weather Map',
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: ChangeNotifierProvider(
