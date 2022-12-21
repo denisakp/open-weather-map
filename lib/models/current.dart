@@ -21,12 +21,12 @@ class Current {
 
   final Weather weather;
 
-  final double temp;
+  final int temp;
   // final double tempMin;
   // final double tempMax;
   final int humidity;
   final int pressure;
-  final double feelsLike;
+  final int feelsLike;
 
   final DateTime dt;
 
@@ -43,7 +43,7 @@ class Current {
   factory Current.fromJSon(Map<String, dynamic> json) {
     return Current(
         weather: Weather.fromJson(json['weather'][0]),
-        temp: json['main']['temp'] as double,
+        temp: json['main']['temp'].ceil(),
         // tempMin: json['main']['temp_min'] as double,
         // tempMax: json['main']['temp_max'] as double,
         humidity: json['main']['humidity'] as int,
@@ -55,7 +55,7 @@ class Current {
         sunrise: DateTime.fromMillisecondsSinceEpoch(json['sys']['sunrise'] * 1000),
         windDeg: json['wind']['deg'] as int,
         windSpeed: json['wind']['speed'],
-        feelsLike: json['main']['feels_like'].toDouble(),
+        feelsLike: json['main']['feels_like'].ceil(),
         pressure: json['main']['pressure']
     );
   }

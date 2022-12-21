@@ -43,7 +43,7 @@ class Item {
 
     // final DateTime dt;
 
-    final double temp;
+    final int temp;
     // final double feelsLike;
     // final double tempMin;
     // final double tempMax;
@@ -58,7 +58,7 @@ class Item {
       return Item(
           // dt: DateTime.fromMillisecondsSinceEpoch(json['dt'] * 1000),
           weather: Weather.fromJson(json['weather'][0]),
-          temp: json['main']['temp'].toDouble(),
+          temp: json['main']['temp'].ceil(),
           // tempMin: json['main']['temp_min'].toDouble(),
           // tempMax: json['main']['temp_max'].toDouble(),
           // humidity: json['main']['humidity'],
