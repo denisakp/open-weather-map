@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_open_weather_map/screens/screens.dart';
 import 'package:provider/provider.dart';
 
-import 'package:flutter_open_weather_map/widgets/wind.dart';
 import 'notifiers/notifiers.dart';
 
 void main() {
@@ -21,7 +20,7 @@ class MyApp extends StatelessWidget {
         body: ChangeNotifierProvider(
           create: (_) => OpenWeatherMapNotifier(),
           lazy: false,
-          child: const MainScreen(),
+          child: const MainPage(),
         ),
       ),
     );

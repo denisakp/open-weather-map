@@ -1,28 +1,91 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import 'package:flutter_open_weather_map/notifiers/notifiers.dart';
-import 'owm_widgets.dart';
+import 'package:flutter_open_weather_map/models/models.dart';
 
-class MainScreen extends StatelessWidget {
-  const MainScreen({super.key});
+const primaryColor = Color(0xff2c2c2c);
+const blackColor = Colors.black;
+const whiteColor = Colors.white;
+const greyColor = Color(0xffc4c4c4);
+const bgGreyColor = Color(0xfffdfcfc);
+const darkGreyColor = Color(0xff9a9a9a);
 
-  @override
-  Widget build(BuildContext context) {
-    final notifier = context.watch<OpenWeatherMapNotifier>();
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: notifier.isLoading == false
-        ?
-          _View()
-          :
-            const Center(
-              child: SpinKitFadingCircle(color: Colors.blue, size: 80),
-            )
-    );
-  }
+Widget ownForecast(int index, List<Item>? items) {
+  return Container(
+    padding: const EdgeInsets.symmetric(horizontal: 15),
+    margin: index == 0 ? const EdgeInsets.only(left: 20) : null,
+    child: Column(
+      children: [
+        ownText(
+            size: 14,
+            text: '${items?[index].dtTxt.hour.toString().padLeft(2, '0')}h',
+            color: primaryColor
+        ),
+        const SizedBox(height: 10),
+        Image.network('https://openweathermap.org/img/wn/${items?[index].weather.icon}@2x.png', scale: 2),
+        const SizedBox(height: 5),
+        ownText(
+            size: 14,
+            text: '${items?[index].temp}°' // print forecast
+        )
+      ],
+    ),
+  );
+}
+
+Widget ownText({ FontWeight isBold = FontWeight.normal,  Color color = blackColor,  required double size,  required String text,  int maxLines = 0, bool overFlow = false, bool alignCenter = false }) {
+  return Text(
+    text,
+    textAlign: alignCenter == true ? TextAlign.center : null,
+    maxLines: maxLines == 0 ? null : maxLines,
+    overflow: overFlow == true ? TextOverflow.ellipsis : null,
+    style: TextStyle(
+        color: color,
+        fontSize: size,
+        fontWeight: isBold
+    ),
+  );
+}
+
+Widget owmListTile({ required String first, required String second, required IconData icon, required Color iconColor, String text = '' }) {
+  return ListTile(
+    trailing: ownText(size: 16, text: text, color: darkGreyColor),
+    leading: Icon(icon, color: iconColor),
+    title: RichText(
+      maxLines: 1,
+      text: TextSpan(
+        children: [
+          TextSpan(
+              text: first,
+              style: const TextStyle(
+                  color: darkGreyColor,
+                  fontSize: 16
+              )
+          ),
+          TextSpan(
+              text: second,
+              style: const TextStyle(
+                  color: primaryColor,
+                  fontSize: 16
+              )
+          )
+        ],
+      ),
+    ),
+  );
+}
+
+showSnackBar(BuildContext context, String text, { Color color = primaryColor }) {
+  return ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+          content: Text(text, textAlign: TextAlign.center),
+          elevation: 3,
+          backgroundColor: color
+      )
+  );
 }
 
 class Wind extends StatelessWidget {
@@ -36,42 +99,42 @@ class Wind extends StatelessWidget {
 
     return Padding(
         padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
                 padding: const EdgeInsets.only(left: 10),
-              child: ownText(
-                  size: 20.0,
-                  text: 'Wind',
-                  color: primaryColor.withOpacity(.8),
-                  isBold: FontWeight.bold
+                child: ownText(
+                    size: 20.0,
+                    text: 'Wind',
+                    color: primaryColor.withOpacity(.8),
+                    isBold: FontWeight.bold
+                ),
               ),
-            ),
-            Card(
-              color: bgGreyColor,
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(11),
-              ),
-              child: SizedBox(
-                width: double.maxFinite,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                   owmListTile(
-                       first: 'Speed',
-                       second: ' $speed km/h',
-                       icon: Icons.air,
-                       iconColor: Colors.blue,
-                       text: 'direction'
-                   )
-                  ]
-                )
+              Card(
+                  color: bgGreyColor,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(11),
+                  ),
+                  child: SizedBox(
+                      width: double.maxFinite,
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            owmListTile(
+                                first: 'Speed',
+                                second: ' $speed km/h',
+                                icon: Icons.air,
+                                iconColor: Colors.blue,
+                                text: 'direction'
+                            )
+                          ]
+                      )
+                  )
               )
-            )
-          ]
-      )
+            ]
+        )
     );
   }
 }
@@ -117,9 +180,9 @@ class Barometer extends StatelessWidget {
             padding: const EdgeInsets.only(left: 10),
             child: ownText(
                 size: 20,
-              color: primaryColor.withOpacity(.8),
-              text: 'Barometer',
-              isBold: FontWeight.bold
+                color: primaryColor.withOpacity(.8),
+                text: 'Barometer',
+                isBold: FontWeight.bold
             ),
           ),
           Card(
@@ -181,10 +244,6 @@ class Header extends StatelessWidget {
                 prefixIcon: IconButton(
                   icon: const Icon(Icons.search, color: Colors.black),
                   onPressed: notifier.onSubmitSearch,
-                ),
-                border: const OutlineInputBorder(
-                  borderSide: BorderSide.none,
-                  borderRadius: BorderRadius.all(Radius.circular(15)),
                 ),
               ),
             )
@@ -256,7 +315,9 @@ class City extends StatelessWidget {
   }
 }
 
-class _View extends StatelessWidget {
+class View extends StatelessWidget {
+  const View({super.key});
+
   @override
   Widget build(BuildContext context) {
     final notifier = context.read<OpenWeatherMapNotifier>();
@@ -266,29 +327,65 @@ class _View extends StatelessWidget {
           children: [
             notifier.current?.city != null
                 ?
-                  SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: const [
-                          SizedBox(height: 70),
-                          City(),
-                          SizedBox(height: 15),
-                          Carousel(),
-                          SizedBox(height: 15),
-                          Wind(),
-                          SizedBox(height: 15),
-                          Barometer(),
-                        ]
-                    ),
-                  )
+            SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: const [
+                    SizedBox(height: 70),
+                    City(),
+                    SizedBox(height: 15),
+                    Carousel(),
+                    SizedBox(height: 15),
+                    Wind(),
+                    SizedBox(height: 15),
+                    Barometer(),
+                  ]
+              ),
+            )
                 :
-                  Center(
-                    child: ownText(size: 16, text: 'Hello world'),
-                  ),
+            Center(
+              child: ownText(size: 16, text: 'Hello world'),
+            ),
             const Header()
           ],
         )
+    );
+  }
+}
+
+class SearchBar extends StatelessWidget {
+  const SearchBar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final notifier = context.read<OpenWeatherMapNotifier>();
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Container(
+          width: double.infinity,
+          height: 40,
+          decoration: BoxDecoration(
+              color: Colors.white, borderRadius: BorderRadius.circular(5)
+          ),
+          child: Center(
+            child: TextField(
+              onChanged: ((value) => notifier.city = value),
+              onSubmitted: (_) => notifier.onSubmitSearch(),
+              decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.search),
+                  suffixIcon: IconButton(
+                      icon: const Icon(Icons.clear),
+                      onPressed: () => notifier.city = ""
+                  ),
+                  hintText: 'Search',
+                  border: InputBorder.none
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

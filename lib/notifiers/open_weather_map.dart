@@ -43,7 +43,6 @@ class OpenWeatherMapNotifier extends ChangeNotifier {
     debugPrint('onSubmitSearch');
   }
 
-
   void updateState() {
     _isLoading = !_isLoading;
     notifyListeners();
